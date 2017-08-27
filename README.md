@@ -13,7 +13,7 @@ Mongo 3.4
 ### Installing
 ```
 go build
-./shopapp
+./go-mgo-ambioshop
 ```
 
 ## Running the tests
