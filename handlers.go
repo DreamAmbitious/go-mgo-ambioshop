@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"./models"
+	"./models/Order"
+	"./models/Product"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +22,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func ProductIndex(w http.ResponseWriter, r *http.Request) {
 	session := getSession()
 	defer session.Close()
-	var products []models.Product
+	var products []Product.Product
 	c := session.DB("shop").C("products")
 	err := c.Find(bson.M{}).All(&products)
 	if err != nil {
@@ -39,10 +41,32 @@ func ProductIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", pj)
 }
 
+func OrderIndex(w http.ResponseWriter, r *http.Request) {
+	session := getSession()
+	defer session.Close()
+	var orders []Order.Order
+	c := session.DB("shop").C("order")
+	err := c.Find(bson.M{}).All(&orders)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Failed get all books: ", err)
+		return
+	}
+
+	// Marshal provided interface into JSON structure
+	pj, err := json.MarshalIndent(orders, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "%s", pj)
+}
+
 func ProductShow(w http.ResponseWriter, r *http.Request) {
 	session := getSession()
 	defer session.Close()
-	var product models.Product
+	var product Product.Product
 	vars := mux.Vars(r)
 	err := session.DB("shop").C("products").
 		Find(bson.M{"_id": bson.ObjectIdHex(vars["Id"])}).
@@ -71,8 +95,8 @@ func ProductCreate(w http.ResponseWriter, r *http.Request) {
 	session := getSession()
 	defer session.Close()
 	// Stub an product to be populated from the body
-	p := models.Product{}
-	models.EnsureIndex(session)
+	p := Product.Product{}
+	Product.EnsureIndex(session)
 	// Populate the product data
 	json.NewDecoder(r.Body).Decode(&p)
 	log.Println(&p)
@@ -119,4 +143,32 @@ func ProductDelete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func OrderCreate(w http.ResponseWriter, r *http.Request) {
+	session := getSession()
+	defer session.Close()
+	o := Order.Order{}
+	o.Created = time.Now()
+	Product.EnsureIndex(session)
+	json.NewDecoder(r.Body).Decode(&o)
+	// Add an Id
+	o.Id = bson.NewObjectId()
+	// Write the product to mongo
+	err := session.DB("shop").C("orders").Insert(&o)
+
+	if err != nil {
+		log.Println("I should get here")
+		if mgo.IsDup(err) {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Unable to take your order at this time")
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Failed insert order: %v", err)
+		return
+	}
+	// Write content-type, statuscode, payload
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
 }

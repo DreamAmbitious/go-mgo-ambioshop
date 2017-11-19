@@ -1,7 +1,8 @@
 package main
 
 import mgo "gopkg.in/mgo.v2"
-import "./models"
+import "./models/Product"
+import "./models/Order"
 
 func getSession() *mgo.Session {
 	// Connect to our local mongo
@@ -11,6 +12,7 @@ func getSession() *mgo.Session {
 	if err != nil {
 		panic(err)
 	}
-	models.EnsureIndex(s)
+	Product.EnsureIndex(s)
+	Order.EnsureIndex(s)
 	return s
 }

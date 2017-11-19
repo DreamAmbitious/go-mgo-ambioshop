@@ -42,4 +42,29 @@ var routes = Routes{
 		"/products/{Id}",
 		ProductShow,
 	},
+
+	Route{
+		"OrderIndex",
+		"GET",
+		"/orders",
+		OrderIndex,
+	},
+	Route{
+		"OrderCreate",
+		"POST",
+		"/orders",
+		OrderCreate,
+	},
+	Route{
+		"OrderDelete",
+		"DELETE",
+		"/products/{Id}",
+		ProductDelete,
+	},
+	Route{
+		"OrderShow",
+		"GET",
+		"/products/{Id}",
+		ProductShow,
+	},
 }
