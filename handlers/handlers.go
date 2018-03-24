@@ -1,8 +1,9 @@
-package main
+package handlers
 
-import mgo "gopkg.in/mgo.v2"
-import "./models/Product"
-import "./models/Order"
+import (
+	"github.com/DreamAmbitious/go-mgo-ambioshop.git/models"
+	mgo "gopkg.in/mgo.v2"
+)
 
 func getSession() *mgo.Session {
 	// Connect to our local mongo
@@ -12,7 +13,7 @@ func getSession() *mgo.Session {
 	if err != nil {
 		panic(err)
 	}
-	Product.EnsureIndex(s)
-	Order.EnsureIndex(s)
+	models.ProductIndex(s)
+	models.OrderIndex(s)
 	return s
 }

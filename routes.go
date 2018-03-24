@@ -1,6 +1,10 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/DreamAmbitious/go-mgo-ambioshop.git/handlers"
+)
 
 type Route struct {
 	Name        string
@@ -16,55 +20,55 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"/",
-		Index,
+		handlers.Index,
 	},
 	Route{
 		"ProductIndex",
 		"GET",
 		"/products",
-		ProductIndex,
+		handlers.ProductIndex,
 	},
 	Route{
 		"ProductCreate",
 		"POST",
 		"/products",
-		ProductCreate,
+		handlers.ProductCreate,
 	},
 	Route{
 		"ProductDelete",
 		"DELETE",
 		"/products/{Id}",
-		ProductDelete,
+		handlers.ProductDelete,
 	},
 	Route{
 		"ProductShow",
 		"GET",
 		"/products/{Id}",
-		ProductShow,
+		handlers.ProductShow,
 	},
 
 	Route{
 		"OrderIndex",
 		"GET",
 		"/orders",
-		OrderIndex,
+		handlers.OrderIndex,
 	},
 	Route{
 		"OrderCreate",
 		"POST",
 		"/orders",
-		OrderCreate,
+		handlers.OrderCreate,
 	},
-	Route{
-		"OrderDelete",
-		"DELETE",
-		"/products/{Id}",
-		ProductDelete,
-	},
-	Route{
-		"OrderShow",
-		"GET",
-		"/products/{Id}",
-		ProductShow,
-	},
+	/*			Route{
+					"OrderDelete",
+					"DELETE",
+					"/products/{Id}",
+					handlers.ProductDelete,
+				},
+				Route{
+					"OrderShow",
+					"GET",
+					"/products/{Id}",
+					handlers.ProductShow,
+				},*/
 }
